@@ -25,7 +25,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/saved-recipes" className="text-base text-gray-500 hover:text-gray-900">
+                <Link to="/saved" className="text-base text-gray-500 hover:text-gray-900">
                   Saved Recipes
                 </Link>
               </li>
