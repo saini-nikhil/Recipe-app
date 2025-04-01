@@ -19,9 +19,13 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 
+app.get("/healthy" ,(req , res) => {
+  res.send("api is healthy")
+})
 
 
-const PORT = process.env.PORT || 5000;
+
+const PORT = process.env.PORT ;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+});  
