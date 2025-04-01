@@ -84,7 +84,6 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
       console.log('Attempting to save recipe:', recipe);
       await onSaveRecipe(recipe);
       console.log('Recipe saved successfully');
-      // Update the saved recipes list after saving
       setSavedRecipeIds([...savedRecipeIds, recipe.id.toString()]);
     } catch (error) {
       console.error('Error saving recipe:', error);
@@ -96,7 +95,6 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
     if (!isAuthenticated) {
       e.preventDefault();
       setLoginWarning(true);
-      // Hide the warning after 3 seconds
       setTimeout(() => setLoginWarning(false), 3000);
     } else {
       navigate(`/recipe/${recipeId}`);

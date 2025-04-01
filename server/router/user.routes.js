@@ -1,5 +1,5 @@
 const express = require("express")
-const authMiddleware = require("../middlewares/auth.midleware")
+
 const {login , register} = require("../controller/auth.controller")
 
 const app = express();
