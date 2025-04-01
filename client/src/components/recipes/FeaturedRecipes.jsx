@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Clock, Users, Loader } from 'lucide-react';
+import config from '../../config';
 
 export default function FeaturedRecipes() {
   const [recipes, setRecipes] = useState([]);
@@ -52,7 +53,7 @@ export default function FeaturedRecipes() {
     };
 
     fetchFeaturedRecipes();
-  }, []);
+  }, []);
 
   if (loading) {
     return (
@@ -93,11 +94,11 @@ export default function FeaturedRecipes() {
                 alt={recipe.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
             </div>
             
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                 {recipe.title}
               </h3>
               
