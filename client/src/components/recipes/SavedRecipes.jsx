@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Heart, Trash2, Loader, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import config from '../../config';
 import {
   DndContext,
   closestCenter,
@@ -123,17 +124,11 @@ export default function SavedRecipes({ isAuthenticated }) {
   const fetchSavedRecipes = async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log('Fetching saved recipes with token:', token ? 'Token exists' : 'No token found');
-      
-      const response = await axios.get('http://localhost:5000/api/recipes/saved/all', {
+      const response = await axios.get(`${config.SERVER_URL}/api/recipes/saved/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
-      console.log('Saved recipes response:', response.data);
       setRecipes(response.data.sort((a, b) => a.order - b.order));
     } catch (err) {
-      console.error('Error fetching saved recipes:', err);
-      console.error('Error details:', err.response?.data || err.message);
       setError('Error fetching saved recipes. Please try again.');
     } finally {
       setLoading(false);
@@ -175,7 +170,7 @@ export default function SavedRecipes({ isAuthenticated }) {
         // Send the update to the backend
         const token = localStorage.getItem('token');
         await axios.put(
-          'http://localhost:5000/api/recipes/saved/reorder',
+          `${config.SERVER_URL}/api/recipes/saved/reorder`,
           { recipes: updatedRecipes },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -194,7 +189,7 @@ export default function SavedRecipes({ isAuthenticated }) {
     setRemoving(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/recipes/saved/${recipeId}`, {
+      await axios.delete(`${config.SERVER_URL}/api/recipes/saved/${recipeId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRecipes(recipes.filter(recipe => recipe.recipeId !== recipeId));

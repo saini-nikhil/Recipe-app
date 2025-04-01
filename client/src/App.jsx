@@ -10,6 +10,7 @@ import RecipeDetail from './components/recipes/RecipeDetail';
 import SavedRecipes from './components/recipes/SavedRecipes';
 import AiRecipeGenerator from './components/recipes/AiRecipeGenerator';
 import Footer from './components/Footer';
+import config from './config';
 
 // Private Route Component
 const PrivateRoute = ({ children }) => {
@@ -31,6 +32,7 @@ function App() {
   }, []);
 
   const handleLogin = (token) => {
+    console.log('handleLogin called with token');
     localStorage.setItem('token', token);
     setIsAuthenticated(true);
     toast.success('Login successful!');
@@ -50,7 +52,7 @@ function App() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/recipes/save', {
+      const response = await fetch(`${config.SERVER_URL}/api/recipes/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +86,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<Register onLogin={handleLogin} />} />
             <Route 
               path="/search" 
               element={<RecipeSearch isAuthenticated={isAuthenticated} onSaveRecipe={handleSaveRecipe} />} 

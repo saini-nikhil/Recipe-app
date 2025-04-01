@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { User, Lock, Loader, Check } from 'lucide-react';
+import config from '../../config';
 
 export default function Register({ onLogin }) {
   const navigate = useNavigate();
@@ -31,15 +32,49 @@ export default function Register({ onLogin }) {
 
     setLoading(true);
 
+    console.log('Starting registration with:', { 
+      email: formData.email,
+      passwordLength: formData.password.length,
+      serverUrl: config.SERVER_URL
+    });
+
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      
+      
+      const response = await axios.post(`${config.SERVER_URL}/api/auth/register`, {
         email: formData.email,
         password: formData.password,
       });
+
+  
+      
+      if (!response.data.token) {
+        console.error('No token received in registration response');
+        setError('Registration succeeded but no token was received. Please try logging in.');
+        setLoading(false);
+        return;
+      }
+
+      // Store token in localStorage
       localStorage.setItem('token', response.data.token);
+      
+      // Check if onLogin function is available
+      if (typeof onLogin !== 'function') {
+        console.error('onLogin is not a function:', onLogin);
+        setError('Registration succeeded but login process failed. Please try logging in.');
+        navigate('/login');
+        return;
+      }
+      
+      
       onLogin(response.data.token);
+      
+    
       navigate('/');
     } catch (err) {
+      console.error('Registration error:', err);
+      console.error('Error details:', err.response?.data || err.message);
+      
       setError(err.response?.data?.message || 'An error occurred during registration');
     } finally {
       setLoading(false);

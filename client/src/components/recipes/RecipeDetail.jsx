@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Heart, Clock, Users, Info, ArrowLeft, ChefHat, Loader, MessageCircle, ShoppingCart, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import config from '../../config';
 
 const RecipeDetail = ({ isAuthenticated, onSaveRecipe }) => {
   const { id } = useParams();
@@ -23,10 +24,8 @@ const RecipeDetail = ({ isAuthenticated, onSaveRecipe }) => {
           return;
         }
 
-        const response = await axios.get(`https://api.spoonacular.com/recipes/${id}/information`, {
-          params: {
-            apiKey: import.meta.env.VITE_SPOONACULAR_API_KEY
-          }
+        const response = await axios.get(`${config.SERVER_URL}/api/recipes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         setRecipe(response.data);
@@ -50,7 +49,7 @@ const RecipeDetail = ({ isAuthenticated, onSaveRecipe }) => {
   const checkIfSaved = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/recipes/saved/all', {
+      const response = await axios.get(`${config.SERVER_URL}/api/recipes/saved/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

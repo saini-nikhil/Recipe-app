@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Heart, Clock, Loader } from 'lucide-react';
+import config from '../../config';
 
 export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +27,7 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
       const token = localStorage.getItem('token');
       if (!token) return;
       
-      const response = await axios.get('http://localhost:5000/api/recipes/saved/all', {
+      const response = await axios.get(`${config.SERVER_URL}/api/recipes/saved/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -45,7 +46,7 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
 
     try {
       const currentOffset = reset ? 0 : offset;
-      const response = await axios.get(`http://localhost:5000/api/recipes/search`, {
+      const response = await axios.get(`${config.SERVER_URL}/api/recipes/search`, {
         params: {
           query: searchQuery,
           offset: currentOffset,

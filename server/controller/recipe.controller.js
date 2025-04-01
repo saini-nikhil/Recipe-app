@@ -1,11 +1,14 @@
 const axios = require('axios');
 const User = require('../models/user'); 
+require('dotenv').config();
+
+const API_BASE_URL = process.env.API_BASE_URL;
 
 const search = async (req, res) => {
   try {
     const { query, offset = 0, number = 10 } = req.query;
     const response = await axios.get(
-      'https://api.spoonacular.com/recipes/complexSearch',
+      `${API_BASE_URL}/recipes/complexSearch`,
       {
         params: {
           apiKey: process.env.SPOONACULAR_API_KEY,
@@ -25,7 +28,7 @@ const search = async (req, res) => {
 const get = async (req, res) => {
   try {
     const response = await axios.get(
-      `https://api.spoonacular.com/recipes/${req.params.id}/information`,
+      `${API_BASE_URL}/recipes/${req.params.id}/information`,
       {
         params: {
           apiKey: process.env.SPOONACULAR_API_KEY,
