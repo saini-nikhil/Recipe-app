@@ -13,8 +13,7 @@ export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the route the user was trying to access before being redirected to login
-  const from = location.state?.from?.pathname || '/';
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
