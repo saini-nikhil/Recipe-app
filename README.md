@@ -8,6 +8,7 @@ A full-stack web application that allows users to search, save, and manage their
 - 🤖 AI-powered recipe suggestions using Google's Gemini
 - 👤 User authentication (Register/Login)
 - 💾 Save favorite recipes
+- 🎯 Drag and drop reordering of saved recipes
 - 📱 Responsive design for all devices
 - 🎨 Modern UI with smooth animations
 - 🔒 Secure API key management
@@ -23,6 +24,7 @@ A full-stack web application that allows users to search, save, and manage their
 - React Router
 - React Hot Toast
 - Lucide Icons
+- React DnD (Drag and Drop)
 
 ### Backend
 - Node.js
@@ -115,6 +117,7 @@ The application will be available at:
 - `GET /api/recipes/saved` - Get saved recipes
 - `DELETE /api/recipes/saved/:id` - Remove saved recipe
 - `POST /api/recipes/ai-suggest` - Get AI-powered recipe suggestions
+- `PUT /api/recipes/saved/reorder` - Update saved recipes order
 
 ## Project Structure
 
@@ -153,6 +156,7 @@ recipe-app/
 - View detailed recipe information
 - Save favorite recipes
 - Remove saved recipes
+- Drag and drop reordering of saved recipes
 - Responsive recipe cards with hover effects
 
 ### AI Integration
@@ -161,6 +165,14 @@ recipe-app/
 - Contextual recipe suggestions based on user preferences
 - Detailed recipe instructions and ingredients
 - Nutritional information and cooking tips
+
+### Drag and Drop Features
+- Intuitive drag and drop interface for saved recipes
+- Real-time visual feedback during dragging
+- Smooth animations for reordering
+- Persistent order saving to database
+- Touch-friendly for mobile devices
+- Keyboard accessibility support
 
 ### User Interface
 - Clean and modern design
@@ -177,9 +189,6 @@ recipe-app/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
@@ -187,4 +196,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Google Gemini AI](https://ai.google.dev/) for intelligent recipe suggestions
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [React](https://reactjs.org/) for the frontend framework
-- [Express](https://expressjs.com/) for the backend framework 
+- [Express](https://expressjs.com/) for the backend framework
+- [React DnD](https://react-dnd.github.io/react-dnd/) for drag and drop functionality 
