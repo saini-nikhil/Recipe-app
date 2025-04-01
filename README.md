@@ -1,10 +1,11 @@
 # Recipe App
 
-A full-stack web application that allows users to search, save, and manage their favorite recipes using the Spoonacular API.
+A full-stack web application that allows users to search, save, and manage their favorite recipes using the Spoonacular API and Google's Gemini AI for intelligent recipe suggestions.
 
 ## Features
 
 - 🔍 Search recipes by name, ingredients, or cuisine
+- 🤖 AI-powered recipe suggestions using Google's Gemini
 - 👤 User authentication (Register/Login)
 - 💾 Save favorite recipes
 - 📱 Responsive design for all devices
@@ -30,12 +31,14 @@ A full-stack web application that allows users to search, save, and manage their
 - JWT Authentication
 - Bcrypt for password hashing
 - CORS enabled
+- Google Gemini AI API
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - MongoDB
 - Spoonacular API key
+- Google Gemini API key
 
 ## Environment Variables
 
@@ -45,6 +48,7 @@ PORT=5000
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 SPOONACULAR_API_KEY=your_spoonacular_api_key
+GEMINI_API_KEY=your_gemini_api_key
 API_BASE_URL=http://localhost:5000
 CLIENT_URL=http://localhost:5173
 ```
@@ -110,6 +114,7 @@ The application will be available at:
 - `POST /api/recipes/save` - Save a recipe
 - `GET /api/recipes/saved` - Get saved recipes
 - `DELETE /api/recipes/saved/:id` - Remove saved recipe
+- `POST /api/recipes/ai-suggest` - Get AI-powered recipe suggestions
 
 ## Project Structure
 
@@ -144,10 +149,18 @@ recipe-app/
 
 ### Recipe Management
 - Search recipes using Spoonacular API
+- AI-powered recipe suggestions using Gemini
 - View detailed recipe information
 - Save favorite recipes
 - Remove saved recipes
 - Responsive recipe cards with hover effects
+
+### AI Integration
+- Fallback to Gemini AI when Spoonacular doesn't have specific recipes
+- Natural language processing for recipe requests
+- Contextual recipe suggestions based on user preferences
+- Detailed recipe instructions and ingredients
+- Nutritional information and cooking tips
 
 ### User Interface
 - Clean and modern design
@@ -171,6 +184,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - [Spoonacular API](https://spoonacular.com/food-api) for recipe data
+- [Google Gemini AI](https://ai.google.dev/) for intelligent recipe suggestions
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [React](https://reactjs.org/) for the frontend framework
 - [Express](https://expressjs.com/) for the backend framework 
