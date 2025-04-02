@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, Clock, Users, Info, ArrowLeft, ChefHat, Loader, MessageCircle, ShoppingCart, ChevronRight } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { Heart, Clock, Users, ArrowLeft, Loader, Share2 } from 'lucide-react';
 import config from '../../config';
 
 const RecipeDetail = ({ isAuthenticated, onSaveRecipe }) => {
@@ -11,91 +10,96 @@ const RecipeDetail = ({ isAuthenticated, onSaveRecipe }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSaved, setIsSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [loginWarning, setLoginWarning] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Please login to view recipe details');
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(`${config.SERVER_URL}/api/recipes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
+        setLoading(true);
+        setError('');
+        
+        // Fetch recipe from Spoonacular API
+        const response = await axios.get(
+          `https://api.spoonacular.com/recipes/${id}/information?apiKey=${import.meta.env.VITE_SPOONACULAR_API_KEY}`
+        );
+        
         setRecipe(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching recipe:', err);
-        setError('Failed to load recipe details');
+        
+        // Check if recipe is saved (only if user is authenticated)
+        if (isAuthenticated) {
+          try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+              setIsSaved(false);
+              return;
+            }
+            
+            const savedResponse = await axios.get(`${config.SERVER_URL}/api/recipes/saved`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (savedResponse.data && Array.isArray(savedResponse.data)) {
+              setIsSaved(savedResponse.data.some(r => r.recipeId === id));
+            } else {
+              setIsSaved(false);
+            }
+          } catch (savedError) {
+            console.error('Error checking saved status:', savedError);
+            setIsSaved(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching recipe:', error);
+        if (error.response?.status === 404) {
+          setError('Recipe not found. Please try another recipe.');
+        } else if (error.response?.status === 401) {
+          setError('API key is invalid or has expired.');
+        } else {
+          setError('Failed to load recipe details. Please try again later.');
+        }
+      } finally {
         setLoading(false);
       }
     };
 
     fetchRecipe();
-  }, [id]);
+  }, [id, isAuthenticated]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      checkIfSaved();
-    }
-  }, [isAuthenticated, id]);
-
-  const checkIfSaved = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${config.SERVER_URL}/api/recipes/saved/all`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      const savedRecipeIds = response.data.map(recipe => recipe.recipeId);
-      setIsSaved(savedRecipeIds.includes(id));
-    } catch (err) {
-      console.error('Error checking saved status', err);
-    }
-  };
-
-  const handleSaveRecipe = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+  const handleSaveRecipe = async () => {
     if (!isAuthenticated) {
-      toast.error('Please login to save recipes');
-      navigate('/login');
+      setLoginWarning(true);
+      setTimeout(() => setLoginWarning(false), 3000);
       return;
     }
-    
-    setSaving(true);
+
     try {
-      if (!isSaved) {
-        await onSaveRecipe(recipe);
-        setIsSaved(true);
-      }
+      await onSaveRecipe(recipe);
+      setIsSaved(true);
     } catch (error) {
-      console.error('Error saving recipe', error);
-    } finally {
-      setSaving(false);
+      console.error('Error saving recipe:', error);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader className="h-8 w-8 animate-spin text-blue-500" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader className="h-12 w-12 animate-spin text-blue-500" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center text-red-500">
-          {error}
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 text-lg mb-4">{error}</p>
+          <button
+            onClick={() => navigate('/')}
+            className="text-blue-600 hover:text-blue-700"
+          >
+            Return to Home
+          </button>
         </div>
       </div>
     );
@@ -103,90 +107,114 @@ const RecipeDetail = ({ isAuthenticated, onSaveRecipe }) => {
 
   if (!recipe) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center text-gray-500">
-          Recipe not found
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 text-lg mb-4">Recipe not found</p>
+          <button
+            onClick={() => navigate('/')}
+            className="text-blue-600 hover:text-blue-700"
+          >
+            Return to Home
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link
-        to="/"
-        className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
-      >
-        <ArrowLeft className="h-5 w-5 mr-2" />
-        Back to recipes
-      </Link>
-      
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="relative h-96">
-          <img
-            src={recipe.image}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <h1 className="text-4xl font-bold text-white text-center px-4">
-              {recipe.title}
-            </h1>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {loginWarning && (
+          <div className="fixed top-20 right-4 z-50 px-6 py-3 rounded-lg shadow-lg bg-yellow-500 text-white">
+            Please log in to save recipes
+          </div>
+        )}
+
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Back to Search
+        </button>
+
+        {/* Recipe Header */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+          <div className="relative h-[400px] md:h-[500px]">
+            <img
+              src={recipe.image}
+              alt={recipe.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+              <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  <span>{recipe.readyInMinutes} minutes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  <span>{recipe.servings} servings</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="text-gray-600">{recipe.readyInMinutes} minutes</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="text-gray-600">{recipe.servings} servings</span>
-              </div>
-            </div>
-            <button
-              onClick={handleSaveRecipe}
-              className={`flex items-center px-4 py-2 rounded-lg ${
-                isSaved
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-              }`}
-            >
-              <Heart className={`h-5 w-5 mr-2 ${isSaved ? 'fill-current' : ''}`} />
-              {isSaved ? 'Saved' : 'Save Recipe'}
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Ingredients</h2>
-              <ul className="space-y-2">
-                {recipe.extendedIngredients.map((ingredient, index) => (
-                  <li key={index} className="flex items-center">
-                    <ChevronRight className="h-4 w-4 text-gray-400 mr-2" />
-                    <span className="text-gray-700">
-                      {ingredient.amount} {ingredient.unit} {ingredient.name}
-                    </span>
+        {/* Recipe Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Ingredients */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+              <h2 className="text-2xl font-bold mb-6">Ingredients</h2>
+              <ul className="space-y-3">
+                {recipe.extendedIngredients?.map((ingredient, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <input type="checkbox" className="rounded text-blue-600" />
+                    <span>{ingredient.amount} {ingredient.unit} {ingredient.name}</span>
                   </li>
                 ))}
               </ul>
             </div>
+          </div>
 
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Instructions</h2>
-              <ol className="space-y-4">
-                {recipe.analyzedInstructions[0].steps.map((step, index) => (
-                  <li key={index} className="flex">
-                    <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center mr-3">
+          {/* Right Column - Instructions */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Instructions</h2>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={handleSaveRecipe}
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                  >
+                    <Heart
+                      className={`h-6 w-6 ${
+                        isSaved ? 'text-red-500 fill-red-500' : 'text-gray-400'
+                      }`}
+                    />
+                    {isSaved ? 'Saved' : 'Save Recipe'}
+                  </button>
+                  <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+                    <Share2 className="h-5 w-5" />
+                    Share
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {recipe.analyzedInstructions?.[0]?.steps?.map((step, index) => (
+                  <div key={step.number} className="flex gap-4">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold">
                       {index + 1}
-                    </span>
-                    <span className="text-gray-700">{step.step}</span>
-                  </li>
+                    </div>
+                    <p className="text-gray-700">{step.step}</p>
+                  </div>
                 ))}
-              </ol>
+              </div>
             </div>
           </div>
         </div>
