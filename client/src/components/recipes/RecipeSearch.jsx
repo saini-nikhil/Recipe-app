@@ -231,11 +231,7 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
                     onClick={() => handleSuggestionClick(suggestion)}
                     className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3"
                   >
-                    <img
-                      src={suggestion.image}
-                      alt={suggestion.title}
-                      className="w-12 h-12 rounded-lg object-cover"
-                    />
+                   
                     <span className="text-gray-700">{suggestion.title}</span>
                   </button>
                 ))}
