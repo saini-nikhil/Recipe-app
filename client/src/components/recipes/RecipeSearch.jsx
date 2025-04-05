@@ -148,6 +148,7 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
     e.preventDefault();
     setOffset(0);
     fetchRecipes(searchQuery);
+    setSearchQuery("");
   };
 
   const loadMore = () => {
@@ -160,11 +161,13 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
     e.preventDefault();
     e.stopPropagation();
     
+    
     try {
       console.log('Attempting to save recipe:', recipe);
       await onSaveRecipe(recipe);
       console.log('Recipe saved successfully');
       setSavedRecipeIds([...savedRecipeIds, recipe.id.toString()]);
+      
     } catch (error) {
       console.error('Error saving recipe:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -176,6 +179,7 @@ export default function RecipeSearch({ isAuthenticated, onSaveRecipe }) {
       e.preventDefault();
       setLoginWarning(true);
       setTimeout(() => setLoginWarning(false), 3000);
+     
     } else {
       navigate(`/recipe/${recipeId}`);
     }
